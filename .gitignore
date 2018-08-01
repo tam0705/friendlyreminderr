@@ -1,3 +1,11 @@
+# Build output
+target/
+build
+out/
+
+# gradle
+/.gradle/
+
 # Compiled class file
 *.class
 
