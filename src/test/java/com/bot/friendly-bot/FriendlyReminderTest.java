@@ -1,4 +1,4 @@
-package com.igs.bot.friendly;
+package com.friendly.bot.app;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
