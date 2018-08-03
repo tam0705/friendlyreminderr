@@ -1,4 +1,4 @@
-package com.friendly.bot.app;
+package com.friendly.bot;
 
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.ReplyMessage;
@@ -32,7 +32,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     }
 
     @EventMapping
-    public void handleTextEvent(MessageEvent<TextMessageContent> messageEvent){
-        String message = messageEvent.getMessage().getText().toLowerCase();
+    public void handleTextEvent(MessageEvent<TextMessageContent> event){
+        String message = event.getMessage().getText();
     }
 }

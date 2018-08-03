@@ -1,4 +1,4 @@
-package com.friendly.bot.app;
+package com.friendly.bot;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
