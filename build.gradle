@@ -22,7 +22,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'com.friendly.bot'
 version = '1.0-APLHA'
-sourceCompability = 1.8
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
