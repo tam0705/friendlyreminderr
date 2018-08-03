@@ -5,16 +5,18 @@ buildscript {
     }
     repositories {
         mavenCentral()
+	maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://repo.spring.io/plugins-release' }
     }
     dependencies {
         classpath("gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:${spotBugsVersion}")
-        classpath("org.springframework.boot.spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
 apply plugin: 'com.github.spotbugs'
 apply plugin: 'java'
-apply plugin: 'ecplipse'
+apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
@@ -24,6 +26,8 @@ sourceCompability = 1.8
 
 repositories {
     mavenCentral()
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://repo.spring.io/plugins-release' }
 }
 
 dependencies {
