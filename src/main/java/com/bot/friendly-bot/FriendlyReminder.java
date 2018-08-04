@@ -32,7 +32,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     }
 
     @EventMapping
-    public void handleTextEvent(MessageEvent<TextMessageContent> event){
+    public void handleTextEvent(MessageEvent<TextMessageContent> event) {
         String message = event.getMessage().getText();
     }
 }
