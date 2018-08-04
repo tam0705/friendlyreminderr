@@ -31,9 +31,42 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         SpringApplication.run(FriendlyReminder.class, args);
     }
 
-    /*@EventMapping
-    public void handleTextEvent(MessageEvent<TextMessageContent> event) {
-        String message = event.getMessage().getText();
-    }*/
+    @EventMapping
+    public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {
+        TextMessageContent message = event.getMessage();
+        handleTextContent(event.getReplyToken(), event, message);
+    }
 
+    private void reply(@NonNull String replyToken, @NonNull Message message) {
+        reply(replyToken, Collections.singletonList(message));
+    }
+
+    private void reply(@NonNull String replyToken, @NonNull List<Message> messages) {
+        try {
+            BotApiResponse apiResponse = lineMessagingClient
+                    .replyMessage(new ReplyMessage(replyToken, messages))
+                    .get();
+            log.info("Sent messages: {}", apiResponse);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void replyText(@NonNull String replyToken, @NonNull String message) {
+        if (replyToken.isEmpty()) {
+            throw new IllegalArgumentException("replyToken must not be empty");
+        }
+        if (message.length() > 1000) {
+            message = message.substring(0, 1000 - 2) + "……";
+        }
+        this.reply(replyToken, new TextMessage(message));
+    }
+
+    private void handleTextContent(String replyToken, Event event, TextMessageContent content)
+            throws Exception {
+        String text = content.getText();
+        /*switch (text) {
+
+        }*/
+    }
 }
