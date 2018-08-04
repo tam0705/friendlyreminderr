@@ -1,6 +1,5 @@
 buildscript {
     ext {
-        spotBugsVersion = '1.6.2'
         springBootVersion = '2.0.1.RELEASE'
     }
     repositories {
@@ -9,12 +8,10 @@ buildscript {
         maven { url 'https://repo.spring.io/plugins-release' }
     }
     dependencies {
-        classpath("gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:${spotBugsVersion}")
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
-apply plugin: 'com.github.spotbugs'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
