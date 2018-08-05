@@ -11,28 +11,39 @@ import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.sql.*;
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 
 @SpringBootApplication
 @LineMessageHandler
+@ComponentScan(basePackages = "com.friendly.bot")
 public class FriendlyReminder extends SpringBootServletInitializer {
     String[] lastEditorId = new String[2];
     String[] lastEditorName = new String[2];
 
     @Autowired
     private LineMessagingClient lineMessagingClient;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
@@ -41,6 +52,34 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(FriendlyReminder.class, args);
+    }
+
+    @Bean
+    public BasicDataSource dataSource() throws URISyntaxException {
+        URI dbUri = new URI(System.getenv("DATABASE_URL"));
+
+        String username = dbUri.getUserInfo().split(":")[0];
+        String password = dbUri.getUserInfo().split(":")[1];
+        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
+
+        BasicDataSource basicDataSource = new BasicDataSource();
+        basicDataSource.setUrl(dbUrl);
+        basicDataSource.setUsername(username);
+        basicDataSource.setPassword(password);
+
+        return basicDataSource;
+    }
+
+    @PostConstruct
+    public void myRealMainMethod() throws SQLException {
+        Statement stmt = dataSource.getConnection().createStatement();
+        /*stmt.executeUpdate("DROP TABLE IF EXISTS ticks");
+        stmt.executeUpdate("CREATE TABLE ticks (tick timestamp)");
+        stmt.executeUpdate("INSERT INTO ticks VALUES (now())");
+        ResultSet rs = stmt.executeQuery("SELECT tick FROM ticks");
+        while (rs.next()) {
+            System.out.println("Read from DB: " + rs.getTimestamp("tick"));
+        }*/
     }
 
     @EventMapping
@@ -113,7 +152,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         String[] shorterner = new String[2];
         shorterner[0] = lastEditorName[param];
         shorterner[1] = lastEditorId[param].substring(0,5);
-        String constAnswer1 = "Recently edited by " + shorterner[0] + "[" + shorterner[1] + "]";
+        String constAnswer1 = "Recently edited by " + shorterner[0] + " [" + shorterner[1] + "]";
         if (param == 0) {
             constAnswer0 = "What to do for tomorrow is..";
         } else if (param == 1) {
