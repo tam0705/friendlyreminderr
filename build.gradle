@@ -1,6 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '2.0.1.RELEASE'
+	commonsDbcpVersion = '1.5.4'
     }
     repositories {
         mavenCentral()
@@ -9,6 +10,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	classpath("org.apache.commons-dbcp:commons-dbcp:${commonsDbcpVersion}")
     }
 }
 
