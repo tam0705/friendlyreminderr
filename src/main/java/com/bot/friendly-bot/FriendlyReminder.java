@@ -40,21 +40,6 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     String[] lastEditorId = new String[2];
     String[] lastEditorName = new String[2];
 
-    @Autowired
-    private LineMessagingClient lineMessagingClient;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-        return builder.sources(FriendlyReminder.class);
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(FriendlyReminder.class, args);
-    }
-
     @Bean
     public static BasicDataSource dataSource() throws URISyntaxException {
         URI dbUri = new URI(System.getenv("DATABASE_URL"));
@@ -69,6 +54,21 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         basicDataSource.setPassword(password);
 
         return basicDataSource;
+    }
+
+    @Autowired
+    private LineMessagingClient lineMessagingClient;
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(FriendlyReminder.class);
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(FriendlyReminder.class, args);
     }
 
     @PostConstruct
