@@ -56,7 +56,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     }
 
     @Bean
-    public BasicDataSource dataSource() throws URISyntaxException {
+    public static BasicDataSource dataSource() throws URISyntaxException {
         URI dbUri = new URI(System.getenv("DATABASE_URL"));
 
         String username = dbUri.getUserInfo().split(":")[0];
