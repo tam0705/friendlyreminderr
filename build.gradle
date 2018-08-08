@@ -32,7 +32,8 @@ repositories {
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.apache.commons:commons-dbcp2')
- 
+
+    implementation 'org.apache.commons:commons-dbcp2:2.5.0'
     implementation 'com.linecorp.bot:line-bot-spring-boot:1.15.0'
     implementation 'com.linecorp.bot:line-bot-servlet:1.15.0'
     implementation 'com.linecorp.bot:line-bot-model:1.15.0'
