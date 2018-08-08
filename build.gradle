@@ -2,6 +2,7 @@ buildscript {
     ext {
         springBootVersion = '2.0.1.RELEASE'
 	commonsDbcpVersion = '2.5.0'
+	postgresqlVersion = '42.2.4'
     }
     repositories {
         mavenCentral()
@@ -11,6 +12,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 	classpath("org.apache.commons:commons-dbcp2:${commonsDbcpVersion}")
+	classpath("org.postgresql:postgresql:${postgresqlVersion}")
     }
 }
 
@@ -31,7 +33,8 @@ repositories {
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.apache.commons:commons-dbcp2:2.5.0')
+    compile('org.apache.commons:commons-dbcp2')
+    compile('org.postgresql:postgresql')
 
     implementation 'com.linecorp.bot:line-bot-spring-boot:1.15.0'
     implementation 'com.linecorp.bot:line-bot-servlet:1.15.0'
