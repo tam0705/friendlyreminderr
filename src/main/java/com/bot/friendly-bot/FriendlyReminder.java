@@ -20,10 +20,15 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.sql.*;
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 
 @SpringBootApplication
 @LineMessageHandler
@@ -33,6 +38,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     @Autowired
     private LineMessagingClient lineMessagingClient;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
@@ -101,30 +109,43 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
     }
 
-    private void showReminder(Integer param, String replyToken) {
+    private void showReminder(Integer param, String replyToken) throws SQLException {
+        //Set helper variables
         String constAnswer0 = " ";
         if (lastEditorId[param] == null) {
             lastEditorId[param] = "U0000";
         }
         if (lastEditorName[param] == null) {
-            lastEditorName[param] = "unknown";
+            lastEditorName[param] = "Unknown";
         }
-        //A line can only has max. 112 chars, so shorterners are needed
-        String[] shorterner = new String[2];
-        shorterner[0] = lastEditorName[param];
-        shorterner[1] = lastEditorId[param].substring(0,5);
-        String constAnswer1 = "Recently edited by " + shorterner[0] + "[" + shorterner[1] + "]";
+        String tableName = " ";
         if (param == 0) {
+            tableName = "tomorrow_editor";
             constAnswer0 = "What to do for tomorrow is..";
         } else if (param == 1) {
-            constAnswer0 = "This week's todo list is..";
+            tableName = "week_editor";
+            constAnswer0 = "This week's ToDo list is..";
         }
+
+        //Access the database to refresh last editor infos
+        Statement stmt = dataSource.getConnection().createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT user_id,user_name FROM " + tableName);
+        while (rs.next()) {
+            lastEditorId[param] = rs.getString("user_id");
+            lastEditorName[param] = rs.getString("user_name");
+        }
+        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "]";
+        rs.close();
+        stmt.close();
+
+        //Give response to the user
         this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
     }
 
-    private void editReminder(Integer param, String replyToken, String userId) {
+    private void editReminder(Integer param, String replyToken, String userId) throws SQLException {
+        //Get editor infos
         lastEditorId[param] = "U0000";
-        lastEditorName[param] = "unknown";
+        lastEditorName[param] = "Unknown";
         if (userId != null) {
                     lineMessagingClient
                             .getProfile(userId)
@@ -133,10 +154,29 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                                     this.replyText(replyToken, throwable.getMessage());
                                     return;
                                 }
-                                lastEditorId[param] = userId;
+                                lastEditorId[param] = userId.substring(0,5);
                                 lastEditorName[param] = profile.getDisplayName();
                             });
         }
-        this.replyText(replyToken,"Successfully edited!");
+
+        //Give response to the user
+        this.reply(replyToken,new TextMessage("Successfully edited!"));
+
+        //Set helper variables
+        String tableName = " ";
+        String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null);";
+        String shortener1 = "(user_id,user_name) VALUES (";
+        if (param == 0) {
+            tableName = "tomorrow_editor";
+        } else if (param == 1) {
+            tableName = "week_editor";
+        }
+
+        //Access the database
+        Statement stmt = dataSource.getConnection().createStatement();
+        stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
+        stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId[param] + "," + lastEditorName[param] +")");
+        stmt.close();
     }
 }
