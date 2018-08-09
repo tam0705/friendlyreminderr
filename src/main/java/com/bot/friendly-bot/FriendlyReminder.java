@@ -130,13 +130,12 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         if (lastEditorName[param] == null) {
             lastEditorName[param] = "Unknown";
         }
-        String[] shorterner = new String[2];
-        shorterner[0] = lastEditorName[param];
-        shorterner[1] = lastEditorId[param].substring(0,5);
-        String constAnswer1 = "Recently edited by " + shorterner[0] + " [" + shorterner[1] + "]";
+        String tableName;
         if (param == 0) {
+            tableName = "tomorrow_editor";
             constAnswer0 = "What to do for tomorrow is..";
         } else if (param == 1) {
+            tableName = "week_editor";
             constAnswer0 = "This week's todo list is..";
         }
 
@@ -147,6 +146,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             lastEditorId[param] = rs.getString("user_id");
             lastEditorName[param] = rs.getString("user_name");
         }
+        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorName[param] + "]";
 
         //Give response to the user
         this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
@@ -164,7 +164,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                                     this.replyText(replyToken, throwable.getMessage());
                                     return;
                                 }
-                                lastEditorId[param] = userId;
+                                lastEditorId[param] = userId.substring(0,5);
                                 lastEditorName[param] = profile.getDisplayName();
                             });
         }
@@ -182,8 +182,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
-        stmt.executeUpdate("CREATE TABLE " + tableName + shorterner0);
-        stmt.executeUpdate("INSERT INTO " + tableName + shorterner1 + lastEditorId[param] + "," + lastEditorName[param] +")");
+        stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId[param] + "," + lastEditorName[param] +")");
 
         //Give response to the user
         this.replyText(replyToken,"Successfully edited!");
