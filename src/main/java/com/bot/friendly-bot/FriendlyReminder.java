@@ -159,6 +159,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                             });
         }
 
+        //Give response to the user
+        this.reply(replyToken,new TextMessage("Successfully edited!"));
+
         //Set helper variables
         String tableName = " ";
         String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null);";
@@ -175,8 +178,5 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
         stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId[param] + "," + lastEditorName[param] +")");
         stmt.close();
-
-        //Give response to the user
-        this.reply(replyToken,new TextMessage("Successfully edited!"));
     }
 }
