@@ -146,7 +146,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             lastEditorId[param] = rs.getString("user_id");
             lastEditorName[param] = rs.getString("user_name");
         }
-        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorName[param] + "]";
+        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "]";
 
         //Give response to the user
         this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
