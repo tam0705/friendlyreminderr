@@ -121,7 +121,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
     }
 
-    private void showReminder(Integer param, String replyToken) {
+    private void showReminder(Integer param, String replyToken) throws SQLException {
         //Set helper variables
         String constAnswer0 = " ";
         if (lastEditorId[param] == null) {
@@ -130,7 +130,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         if (lastEditorName[param] == null) {
             lastEditorName[param] = "Unknown";
         }
-        String tableName;
+        String tableName = " ";
         if (param == 0) {
             tableName = "tomorrow_editor";
             constAnswer0 = "What to do for tomorrow is..";
@@ -152,7 +152,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
     }
 
-    private void editReminder(Integer param, String replyToken, String userId) {
+    private void editReminder(Integer param, String replyToken, String userId) throws SQLException {
         //Get editor infos
         lastEditorId[param] = "U0000";
         lastEditorName[param] = "Unknown";
@@ -170,7 +170,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
 
         //Set helper variables
-        String tableName;
+        String tableName = " ";
         String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null);";
         String shortener1 = "(user_id,user_name) VALUES (";
         if (param == 0) {
