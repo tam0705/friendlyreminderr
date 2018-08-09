@@ -144,7 +144,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         ResultSet rs = stmt.executeQuery("SELECT user_id,user_name FROM " + tableName);
         while (rs.next()) {
-            lastEditorId[param] = rs.getString("user_id")
+            lastEditorId[param] = rs.getString("user_id");
             lastEditorName[param] = rs.getString("user_name");
         }
 
@@ -176,7 +176,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         if (param == 0) {
             tableName = "tomorrow_editor";
         } else if (param == 1) {
-            tableName = "week_editor"
+            tableName = "week_editor";
         }
 
         //Access the database
