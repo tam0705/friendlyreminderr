@@ -51,18 +51,6 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         SpringApplication.run(FriendlyReminder.class, args);
     }
 
-    @PostConstruct
-    public void myRealMainMethod() throws SQLException {
-        Statement stmt = dataSource.getConnection().createStatement();
-        /*stmt.executeUpdate("DROP TABLE IF EXISTS ticks");
-        stmt.executeUpdate("CREATE TABLE ticks (tick timestamp)");
-        stmt.executeUpdate("INSERT INTO ticks VALUES (now())");
-        ResultSet rs = stmt.executeQuery("SELECT tick FROM ticks");
-        while (rs.next()) {
-            System.out.println("Read from DB: " + rs.getTimestamp("tick"));
-        }*/
-    }
-
     @EventMapping
     public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {
         TextMessageContent message = event.getMessage();
@@ -136,7 +124,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             constAnswer0 = "What to do for tomorrow is..";
         } else if (param == 1) {
             tableName = "week_editor";
-            constAnswer0 = "This week's todo list is..";
+            constAnswer0 = "This week's ToDo list is..";
         }
 
         //Access the database to refresh last editor infos
@@ -147,6 +135,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             lastEditorName[param] = rs.getString("user_name");
         }
         String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "]";
+        rs.close();
+        stmt.close();
 
         //Give response to the user
         this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
@@ -184,8 +174,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
         stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId[param] + "," + lastEditorName[param] +")");
+        stmt.close();
 
         //Give response to the user
-        this.replyText(replyToken,"Successfully edited!");
+        this.reply(replyToken,new TextMessage("Successfully edited!"));
     }
 }
