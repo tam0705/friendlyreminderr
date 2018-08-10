@@ -134,7 +134,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         while (rs.next()) {
             lastEditorId[param] = rs.getString("user_id");
             lastEditorName[param] = rs.getString("user_name");
-            editTime = rs.getTimestamp("edit_time");
+            editTime = rs.getString("edit_time");
         }
         String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "] at " + editTime;
         rs.close();
@@ -179,11 +179,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         ResultSet rs = stmt.executeQuery("SELECT CURRENT_TIMESTAMP(2)");
         while (rs.next()) {
-            editTime = rs.getTimestamp("current_timestamp");
-        }
-        rs = stmt.executeQuery("SELECT TIMESTAMP WITH TIME ZONE '" + editTime + "' AT TIME ZONE 'GMT'");
-        while (rs.next()) {
-            editTime = rs.getTimestamp("current_timestamp");
+            Timestamp time = rs.getTimestamp("current_timestamp");
+            editTime = new SimpleDateFormat("ddMMyyyy").format(time);
+            editTime = editTime.substring(0,editTime.length()-3)
         }
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
