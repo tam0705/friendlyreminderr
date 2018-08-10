@@ -112,6 +112,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     private void showReminder(Integer param, String replyToken) throws SQLException {
         //Set helper variables
         String constAnswer0 = " ";
+        String editTime = " ";
         if (lastEditorId[param] == null) {
             lastEditorId[param] = "U0000";
         }
@@ -133,8 +134,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         while (rs.next()) {
             lastEditorId[param] = rs.getString("user_id");
             lastEditorName[param] = rs.getString("user_name");
+            editTime = rs.getString("edit_time");
         }
-        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "]";
+        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "] at " + editTime;
         rs.close();
         stmt.close();
 
@@ -164,7 +166,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Set helper variables
         String tableName = " ";
-        String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null);";
+        String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null,edit_time varchar(255) not null);";
         String shortener1 = "(user_id,user_name) VALUES (";
         if (param == 0) {
             tableName = "tomorrow_editor";
@@ -176,7 +178,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
-        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + "'" + lastEditorId[param] + "','" + lastEditorName[param] +"')");
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + "'" + lastEditorId[param] + "','" + lastEditorName[param] + "','" + timeofday() + "')");
         stmt.close();
     }
 }
