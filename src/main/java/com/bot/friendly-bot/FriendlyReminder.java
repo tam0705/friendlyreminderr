@@ -181,7 +181,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         while (rs.next()) {
             Timestamp time = rs.getTimestamp("current_timestamp");
             editTime = new SimpleDateFormat("ddMMyyyy").format(time);
-            editTime = editTime.substring(0,editTime.length()-3)
+            editTime = editTime.substring(0,editTime.length()-3);
         }
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
