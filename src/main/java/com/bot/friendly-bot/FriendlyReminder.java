@@ -130,11 +130,11 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Access the database to refresh last editor infos
         Statement stmt = dataSource.getConnection().createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT user_id,user_name FROM " + tableName);
+        ResultSet rs = stmt.executeQuery("SELECT user_id,user_name,edit_time FROM " + tableName);
         while (rs.next()) {
             lastEditorId[param] = rs.getString("user_id");
             lastEditorName[param] = rs.getString("user_name");
-            editTime = rs.getString("edit_time");
+            editTime = rs.getTimestamp("edit_time");
         }
         String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "] at " + editTime;
         rs.close();
@@ -166,6 +166,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Set helper variables
         String tableName = " ";
+        String editTime = " ";
         String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null,edit_time varchar(255) not null);";
         String shortener1 = "(user_id,user_name) VALUES (";
         if (param == 0) {
@@ -176,9 +177,17 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT CURRENT_TIMESTAMP(2)");
+        while (rs.next()) {
+            editTime = rs.getTimestamp("current_timestamp");
+        }
+        rs = stmt.executeQuery("SELECT TIMESTAMP WITH TIME ZONE '" + editTime + "' AT TIME ZONE 'GMT'");
+        while (rs.next()) {
+            editTime = rs.getTimestamp("current_timestamp");
+        }
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
-        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + "'" + lastEditorId[param] + "','" + lastEditorName[param] + "','" + timeofday() + "')");
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + "'" + lastEditorId[param] + "','" + lastEditorName[param] + "','" + editTime + "')");
         stmt.close();
     }
 }
