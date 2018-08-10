@@ -176,7 +176,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
-        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId[param] + "," + lastEditorName[param] +")");
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + "'" + lastEditorId[param] + "','" + lastEditorName[param] +"')");
         stmt.close();
     }
 }
