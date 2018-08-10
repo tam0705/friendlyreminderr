@@ -172,11 +172,11 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             tableName = "week_editor";
         }
 
-        //Access the database
+        //Access the database to write new infos
         Statement stmt = dataSource.getConnection().createStatement();
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
-        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId[param] + "," + lastEditorName[param] +")");
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + "'" + lastEditorId[param] + "','" + lastEditorName[param] +"')");
         stmt.close();
     }
 }
