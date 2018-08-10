@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 buildscript {
     ext {
         springBootVersion = '2.0.1.RELEASE'
@@ -51,57 +51,3 @@ task wrapper(type: Wrapper) {
 
 task stage(dependsOn: ['build', 'clean'])
 build.mustRunAfter clean
-=======
-buildscript {
-    ext {
-        springBootVersion = '2.0.1.RELEASE'
-	commonsDbcpVersion = '2.5.0'
-	postgresqlVersion = '42.2.4'
-    }
-    repositories {
-        mavenCentral()
-	maven { url 'https://plugins.gradle.org/m2/' }
-        maven { url 'https://repo.spring.io/plugins-release' }
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	classpath("org.apache.commons:commons-dbcp2:${commonsDbcpVersion}")
-	classpath("org.postgresql:postgresql:${postgresqlVersion}")
-    }
-}
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-
-group = 'com.friendly.bot'
-version = '1.0-APLHA'
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-    maven { url 'https://plugins.gradle.org/m2/' }
-    maven { url 'https://repo.spring.io/plugins-release' }
-}
-
-dependencies {
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.apache.commons:commons-dbcp2')
-    compile('org.postgresql:postgresql')
-
-    implementation 'com.linecorp.bot:line-bot-spring-boot:1.15.0'
-    implementation 'com.linecorp.bot:line-bot-servlet:1.15.0'
-    implementation 'com.linecorp.bot:line-bot-model:1.15.0'
-    implementation 'com.linecorp.bot:line-bot-api-client:1.15.0'
-
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.9'
-}
-
-task stage(dependsOn: ['build', 'clean'])
-build.mustRunAfter clean
->>>>>>> e3618004175984486a16a7015ab49c434f06043c
