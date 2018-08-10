@@ -180,7 +180,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         ResultSet rs = stmt.executeQuery("SELECT CURRENT_TIMESTAMP(2)");
         while (rs.next()) {
             Timestamp time = rs.getTimestamp("current_timestamp");
-            editTime = new SimpleDateFormat("ddMMyyyy").format(time);
+            editTime = new SimpleDateFormat("HH:mm dd/MM/yyyy").format(time);
             editTime = editTime.substring(0,editTime.length()-3);
         }
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
