@@ -113,7 +113,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     private void showReminder(Integer param, String replyToken) throws SQLException {
         //Set helper variables
         String constAnswer0 = " ";
-        String editTime = " ";
+        String editTime = "unknown";
         if (lastEditorId[param] == null) {
             lastEditorId[param] = "U0000";
         }
@@ -178,11 +178,10 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT CURRENT_TIMESTAMP(2)");
+        ResultSet rs = stmt.executeQuery("SELECT TIMESTAMP WITH TIME ZONE 'now()' AT TIME ZONE 'WAST';");
         while (rs.next()) {
-            Timestamp time = rs.getTimestamp("current_timestamp");
+            Timestamp time = rs.getTimestamp("timezone");
             editTime = new SimpleDateFormat("HH:mm dd/MM/yyyy").format(time);
-            editTime = editTime.substring(0,editTime.length()-3);
         }
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
