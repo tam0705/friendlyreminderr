@@ -112,16 +112,14 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     private void showReminder(Integer param, String replyToken) throws SQLException {
         //Set helper variables
-        String constAnswer0 = "";
+        String constAnswer0 = ""; //Final form of the response
+        String constAnswer1 = ""; //Opening sentence
+        String constAnswer2 = "Nothing."; //Content of the ToDo list
+        String constAnswer3 = ""; //Recent editor infos
         String tableName = "last_editor";
         lastEditorId = "U0000";
         lastEditorName = "Unknown";
         String editTime = "unknown";
-        if (param == 0) {
-            constAnswer0 = "What to do for tomorrow is..";
-        } else if (param == 1) {
-            constAnswer0 = "This week's ToDo list is..";
-        }
 
         //Access the database to refresh last editor infos
         Statement stmt = dataSource.getConnection().createStatement();
@@ -134,12 +132,20 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         rs.close();
         stmt.close();
 
+        //Set response variables
+        if (param == 0) {
+            constAnswer1 = "What to do for tomorrow is..";
+        } else if (param == 1) {
+            constAnswer1 = "This week's ToDo list is..";
+        }
+        if (editTime != "unknown") {
+            String constAnswer3 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "]" + editTime;
+        }
+        constAnswer0 = constAnswer1 + "\n" + constAnswer2 + "\n" + constAnswer3;
+
         //Give response to the user
         this.reply(replyToken,new TextMessage(constAnswer0));
-        if (editTime != "unknown") {
-            String constAnswer1 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "]" + editTime;
-            this.reply(replyToken,new TextMessage(constAnswer1));
-        }
+        
     }
 
     private void editReminder(Integer param, String replyToken, String userId) throws SQLException {
