@@ -141,8 +141,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     private void editReminder(Integer param, String replyToken, String userId) throws SQLException {
         //Get editor infos
-        String lastEditorId = "U0000";
-        String lastEditorName = "Unknown";
+        final String lastEditorId = "U0000";
+        final String lastEditorName = "Unknown";
         if (userId != null) {
                     lineMessagingClient
                             .getProfile(userId)
