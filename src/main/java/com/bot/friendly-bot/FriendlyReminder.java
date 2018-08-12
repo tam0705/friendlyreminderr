@@ -139,7 +139,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             constAnswer1 = "This week's ToDo list is..";
         }
         if (editTime != "unknown") {
-            String constAnswer3 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "]" + editTime;
+            constAnswer3 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "]" + editTime;
         }
         constAnswer0 = constAnswer1 + "\n" + constAnswer2 + "\n" + constAnswer3;
 
