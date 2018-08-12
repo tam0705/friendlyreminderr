@@ -125,8 +125,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         ResultSet rs = stmt.executeQuery("SELECT user_id,user_name,edit_time FROM " + tableName);
         while (rs.next()) {
-            lastEditorId[param] = rs.getString("user_id");
-            lastEditorName[param] = rs.getString("user_name");
+            lastEditorId = rs.getString("user_id");
+            lastEditorName = rs.getString("user_name");
             editTime = rs.getString("edit_time");
         }
         rs.close();
@@ -134,7 +134,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Give response to the user
        // if (editTime != "unknown") {
-        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "] at " + editTime;
+        String constAnswer1 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "] at " + editTime;
         this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
         //}
     }
@@ -151,8 +151,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                                     this.replyText(replyToken, throwable.getMessage());
                                     return;
                                 }
-                                lastEditorId[param] = userId.substring(0,5);
-                                lastEditorName[param] = profile.getDisplayName();
+                                lastEditorId = userId.substring(0,5);
+                                lastEditorName = profile.getDisplayName();
                             });
         }
 
@@ -163,7 +163,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         String tableName = "last_editor";
         String editTime = "unknown";
         String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null,edit_time varchar(255) not null);";
-        String shortener1 = "(user_id,user_name,edit_time) VALUES (";
+        String shortener1 = "(user_id,user_name,edit_time) VALUES ('";
 
         //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
@@ -174,7 +174,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
-        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + "'" + lastEditorId[param] + "','" + lastEditorName[param] + "','" + editTime + "')");
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId + "','" + lastEditorName] + "','" + editTime + "')");
         stmt.close();
     }
 }
