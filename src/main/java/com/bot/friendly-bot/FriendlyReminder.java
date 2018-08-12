@@ -136,7 +136,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Give response to the user
        // if (editTime != "unknown") {
-        String constAnswer1 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "] at " + editTime;
+        String constAnswer1 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "]" + editTime;
         this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
         //}
     }
@@ -172,7 +172,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         ResultSet rs = stmt.executeQuery("SELECT TIMESTAMP WITH TIME ZONE 'now()' AT TIME ZONE 'WAST';");
         while (rs.next()) {
             Timestamp time = rs.getTimestamp("timezone");
-            editTime = new SimpleDateFormat("HH:mm dd/MM/yyyy").format(time);
+            editTime = new SimpleDateFormat("'at' HH:mm 'on' dd/MM/yyyy").format(time);
         }
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
