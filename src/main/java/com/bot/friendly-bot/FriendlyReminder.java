@@ -135,10 +135,11 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         stmt.close();
 
         //Give response to the user
-       // if (editTime != "unknown") {
-        String constAnswer1 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "]" + editTime;
-        this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
-        //}
+        this.reply(replyToken,new TextMessage(constAnswer0));
+        if (editTime != "unknown") {
+            String constAnswer1 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "]" + editTime;
+            this.reply(replyToken,new TextMessage(constAnswer1));
+        }
     }
 
     private void editReminder(Integer param, String replyToken, String userId) throws SQLException {
