@@ -163,7 +163,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         String tableName = "last_editor";
         String editTime = "unknown";
         String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null,edit_time varchar(255) not null);";
-        String shortener1 = "(user_id,user_name,edit_time) VALUES (";
+        String shortener1 = "(user_id,user_name,edit_time) VALUES ('";
 
         //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
@@ -174,7 +174,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
-        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + "'" + lastEditorId + "','" + lastEditorName] + "','" + editTime + "')");
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId + "','" + lastEditorName + "','" + editTime + "')");
         stmt.close();
     }
 }
