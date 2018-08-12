@@ -34,6 +34,8 @@ import javax.sql.DataSource;
 @SpringBootApplication
 @LineMessageHandler
 public class FriendlyReminder extends SpringBootServletInitializer {
+    private lastEditorId;
+    private lastEditorName;
 
     @Autowired
     private LineMessagingClient lineMessagingClient;
@@ -112,8 +114,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         //Set helper variables
         String constAnswer0 = "";
         String tableName = "last_editor";
-        String lastEditorId = "U0000";
-        String lastEditorName = "Unknown";
+        lastEditorId = "U0000";
+        lastEditorName = "Unknown";
         String editTime = "unknown";
         if (param == 0) {
             constAnswer0 = "What to do for tomorrow is..";
@@ -141,8 +143,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     private void editReminder(Integer param, String replyToken, String userId) throws SQLException {
         //Get editor infos
-        final String lastEditorId = "U0000";
-        final String lastEditorName = "Unknown";
+        lastEditorId = "U0000";
+        lastEditorName = "Unknown";
         if (userId != null) {
                     lineMessagingClient
                             .getProfile(userId)
