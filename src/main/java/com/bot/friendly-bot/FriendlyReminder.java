@@ -34,8 +34,8 @@ import javax.sql.DataSource;
 @SpringBootApplication
 @LineMessageHandler
 public class FriendlyReminder extends SpringBootServletInitializer {
-    private lastEditorId;
-    private lastEditorName;
+    private String lastEditorId;
+    private String lastEditorName;
 
     @Autowired
     private LineMessagingClient lineMessagingClient;
