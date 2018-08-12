@@ -34,8 +34,6 @@ import javax.sql.DataSource;
 @SpringBootApplication
 @LineMessageHandler
 public class FriendlyReminder extends SpringBootServletInitializer {
-    String[] lastEditorId = new String[2];
-    String[] lastEditorName = new String[2];
 
     @Autowired
     private LineMessagingClient lineMessagingClient;
@@ -112,20 +110,14 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     private void showReminder(Integer param, String replyToken) throws SQLException {
         //Set helper variables
-        String constAnswer0 = " ";
+        String constAnswer0 = "";
+        String tableName = "last_editor";
+        String lastEditorId = "U0000";
+        String lastEditorName = "Unknown";
         String editTime = "unknown";
-        if (lastEditorId[param] == null) {
-            lastEditorId[param] = "U0000";
-        }
-        if (lastEditorName[param] == null) {
-            lastEditorName[param] = "Unknown";
-        }
-        String tableName = " ";
         if (param == 0) {
-            tableName = "tomorrow_editor";
             constAnswer0 = "What to do for tomorrow is..";
         } else if (param == 1) {
-            tableName = "week_editor";
             constAnswer0 = "This week's ToDo list is..";
         }
 
@@ -137,18 +129,20 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             lastEditorName[param] = rs.getString("user_name");
             editTime = rs.getString("edit_time");
         }
-        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "] at " + editTime;
         rs.close();
         stmt.close();
 
         //Give response to the user
+       // if (editTime != "unknown") {
+        String constAnswer1 = "Recently edited by " + lastEditorName[param] + " [" + lastEditorId[param] + "] at " + editTime;
         this.reply(replyToken,Arrays.asList(new TextMessage(constAnswer0),new TextMessage(constAnswer1)));
+        //}
     }
 
     private void editReminder(Integer param, String replyToken, String userId) throws SQLException {
         //Get editor infos
-        lastEditorId[param] = "U0000";
-        lastEditorName[param] = "Unknown";
+        String lastEditorId = "U0000";
+        String lastEditorName = "Unknown";
         if (userId != null) {
                     lineMessagingClient
                             .getProfile(userId)
@@ -166,15 +160,10 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         this.reply(replyToken,new TextMessage("Successfully edited!"));
 
         //Set helper variables
-        String tableName = " ";
-        String editTime = " ";
+        String tableName = "last_editor";
+        String editTime = "unknown";
         String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null,edit_time varchar(255) not null);";
-        String shortener1 = "(user_id,user_name) VALUES (";
-        if (param == 0) {
-            tableName = "tomorrow_editor";
-        } else if (param == 1) {
-            tableName = "week_editor";
-        }
+        String shortener1 = "(user_id,user_name,edit_time) VALUES (";
 
         //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
