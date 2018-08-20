@@ -72,16 +72,6 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
     }
 
-    private void replyText(String replyToken, String message) {
-        if (replyToken.isEmpty()) {
-            throw new IllegalArgumentException("replyToken must not be empty");
-        }
-        if (message.length() > 1000) {
-            message = message.substring(0, 1000 - 2) + "...";
-        }
-        this.reply(replyToken, new TextMessage(message));
-    }
-
     private void handleTextContent(String replyToken, Event event, TextMessageContent content)
             throws Exception {
         String text = content.getText();
