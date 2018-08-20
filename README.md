@@ -14,6 +14,6 @@ User commands:
 /help <string:command> - Show help of using a command. Leave blank to show list of commands.
 /reminder <(string/int):parameter> - Show the ToDo list.
 /rm <(string/int):parameter> - Behaves similar to /reminder.
-/rmadd <string:unique_name> <string:due_date> <string:content> - Add a task to the ToDo list.
+/rmadd <string:title> <string:due_date> <(optional)string:content> - Add a task to the ToDo list.
 /rmdel <string:parameter> - Delete a task in the ToDo list.
 ```

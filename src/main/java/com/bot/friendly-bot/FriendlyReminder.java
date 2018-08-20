@@ -74,28 +74,40 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     private void handleTextContent(String replyToken, Event event, TextMessageContent content)
             throws Exception {
+        //Set helper variables
         String text = content.getText();
         String userId = event.getSource().getUserId();
-        switch (text) {
-            case "/reminder tomorrow":
-            case "/reminder 0":
-            case "/rm tomorrow":
-            case "/rm 0":
-                this.showReminder(0,replyToken);
+        String[] keywords = text.split(" ");
+
+        //Detect the command and give response
+        switch (keywords[0]) {
+            case "/reminder": case "/rm":
+                if (keywords.length == 2) {
+                    Integer param = -1;
+                    switch (keywords[1]) {
+                        case "tomorrow": case "0":
+                            param = 0;
+                            break;
+                        case "week": case "1":
+                            param = 1;
+                            break;
+                        case "all": case "2":
+                            param = 2;
+                            break;
+                    }
+                    this.showReminder(param,replyToken);
+                }
                 break;
-            case "/reminder week":
-            case "/reminder 1":
-            case "/rm week":
-            case "/rm 1":
-                this.showReminder(1,replyToken);
-                break;
-            case "/rmedit tomorrow":
-            case "/rmedit 0":
-                this.editReminder(0,replyToken,userId);
-                break;
-            case "/rmedit week":
-            case "/rmedit 1":
-                this.editReminder(1,replyToken,userId);
+            case "/rmadd":
+                if (keywords.length > 2) {
+                    String title = keywords[1];
+                    String dueDate = keywords[2];
+                    String content = "";
+                    if (keywords.length == 3) {
+                        content = keywords[3];
+                    }
+                    addTask(userId,replyToken,title,dueDate,content);
+                }
                 break;
         }
     }
@@ -127,6 +139,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             constAnswer1 = "What to do for tomorrow is..";
         } else if (param == 1) {
             constAnswer1 = "This week's ToDo list is..";
+        } else if (param == 2) {
+            constAnswer1 = "What is in the ToDo list is..";
         }
         if (editTime != "unknown") {
             constAnswer3 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "] " + editTime;
@@ -135,28 +149,24 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Give response to the user
         this.reply(replyToken,new TextMessage(constAnswer0));
-        
     }
 
-    private void editReminder(Integer param, String replyToken, String userId) throws SQLException {
+    private void saveEditorInfos(String replyToken, String userId) throws SQLException {
         //Get editor infos
         lastEditorId = "U0000";
         lastEditorName = "Unknown";
-        if (userId != null) {
+         if (userId != null) {
                     lineMessagingClient
                             .getProfile(userId)
                             .whenComplete((profile, throwable) -> {
                                 if (throwable != null) {
                                     this.replyText(replyToken, throwable.getMessage());
-                                    return;
+                                    return "";
                                 }
                                 lastEditorId = userId.substring(0,5);
                                 lastEditorName = profile.getDisplayName();
                             });
         }
-
-        //Give response to the user
-        this.reply(replyToken,new TextMessage("Successfully edited!"));
 
         //Set helper variables
         String tableName = "last_editor";
@@ -174,6 +184,19 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
         stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId + "','" + lastEditorName + "','" + editTime + "')");
+        rs.close();
         stmt.close();
     }
+
+    private void addTask(String userId, String replyToken, String title, String dueDate, String content) throws SQLException {
+        //Store information about the editor
+        saveEditorInfos(userId,replyToken);
+
+        //Set helper variables
+        String tableName = "todo_list";
+
+        //Access the database
+        Statement stmt = dataSource.getConnection().createStatement();
+        stmt.close();
+    }    
 }
