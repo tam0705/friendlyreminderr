@@ -153,7 +153,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         if (taskTitles.size() > 0) {
             constAnswer2 = "";
-            for (Integer i = 0, i < taskTitles.size(), i++) {
+            for (Integer i = 0; i < taskTitles.size(); i++) {
                 constAnswer2 += "- " + taskTitles.get(i) + "(" + dueDates.get(i) + ")\n";
             }
         }
@@ -221,7 +221,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
         lastEditorName = getUsername(userId);
         String editTime = getCurrentTime();
-        String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime "'";
+        String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime + "'";
 
         //Store information about the editor
         saveEditorInfos(lastEditorId,lastEditorName);
