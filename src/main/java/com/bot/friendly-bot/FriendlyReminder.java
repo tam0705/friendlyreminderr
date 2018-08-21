@@ -113,25 +113,33 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     }
 
     private void showReminder(Integer param, String replyToken) throws SQLException {
-        //Set helper variables
+        //Initialise helper variables
         String constAnswer0 = ""; //Final form of the response
         String constAnswer1 = ""; //Opening sentence
         String constAnswer2 = "Nothing."; //Content of the ToDo list
         String constAnswer3 = ""; //Recent editor infos
-        String tableName = "last_editor";
         lastEditorId = "U0000";
         lastEditorName = "Unknown";
         String editTime = "unknown";
 
-        //Access the database to refresh last editor infos
+        //Access the database to get datas
         Statement stmt = dataSource.getConnection().createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT user_id,user_name,edit_time FROM " + tableName);
-        while (rs.next()) {
+        ResultSet rsEditor = stmt.executeQuery("SELECT user_id,user_name,edit_time FROM last_editor");
+        while (rsEditor.next()) {
             lastEditorId = rs.getString("user_id");
             lastEditorName = rs.getString("user_name");
             editTime = rs.getString("edit_time");
         }
-        rs.close();
+        rsEditor.close();
+
+        List<String> taskTitles = new ArrayList<String>();
+        List<String> dueDates = new ArrayList<String>();
+        ResultSet rsTask = stmt.executeQuery("SELECT title,due_date FROM todo_list");
+        while (rsTask.next()) {
+            taskTitles.add(rs.getString("title"));
+            dueDates.add(rs.getString("due_date"));
+        }
+        rsTask.close();
         stmt.close();
 
         //Set response variables
@@ -142,20 +150,26 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         } else if (param == 2) {
             constAnswer1 = "What is in the ToDo list is..";
         }
+
+        if (taskTitles.size() > 0) {
+            constAnswer2 = "";
+            for (Integer i = 0, i < taskTitles.size(), i++) {
+                constAnswer2 += "- " + taskTitles.get(i) + "(" + dueDates.get(i) + ")\n";
+            }
+        }
+
         if (editTime != "unknown") {
             constAnswer3 = "Recently edited by " + lastEditorName + " [" + lastEditorId + "] " + editTime;
         }
-        constAnswer0 = constAnswer1 + "\n\n" + constAnswer2 + "\n\n" + constAnswer3;
+
+        constAnswer0 = constAnswer1 + "\n\n" + constAnswer2 + "\n" + constAnswer3;
 
         //Give response to the user
         this.reply(replyToken,new TextMessage(constAnswer0));
     }
 
-    private void saveEditorInfos(String replyToken, String userId) throws SQLException {
-        //Get editor infos
-        lastEditorId = "U0000";
-        lastEditorName = "Unknown";
-         if (userId != null) {
+    private String getUsername(String userId) {
+        if (userId != null) {
                     lineMessagingClient
                             .getProfile(userId)
                             .whenComplete((profile, throwable) -> {
@@ -163,40 +177,58 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                                     this.replyText(replyToken, throwable.getMessage());
                                     return "";
                                 }
-                                lastEditorId = userId.substring(0,5);
-                                lastEditorName = profile.getDisplayName();
+                                return profile.getDisplayName();
                             });
+        } else {
+            return "Unknown";
         }
+    }
 
-        //Set helper variables
-        String tableName = "last_editor";
+    private String getCurrentTime() throws SQLException {
         String editTime = "unknown";
-        String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null,edit_time varchar(255) not null);";
-        String shortener1 = "(user_id,user_name,edit_time) VALUES ('";
-
-        //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
         ResultSet rs = stmt.executeQuery("SELECT TIMESTAMP WITH TIME ZONE 'now()' AT TIME ZONE 'WAST';");
         while (rs.next()) {
             Timestamp time = rs.getTimestamp("timezone");
             editTime = new SimpleDateFormat("'at' HH:mm 'on' dd/MM/yyyy").format(time);
         }
+        rs.close();
+        stmt.close();
+        return editTime;
+    }
+
+    private void saveEditorInfos(String userId, String username, String editTime) throws SQLException {
+        //Initialise helper variables
+        String tableName = "last_editor";
+        String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null,edit_time varchar(255) not null);";
+        String shortener1 = "(user_id,user_name,edit_time) VALUES ('";
+
+        //Access the database and save the infos
+        Statement stmt = dataSource.getConnection().createStatement();
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
-        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + lastEditorId + "','" + lastEditorName + "','" + editTime + "')");
+        stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + userId + "','" + username + "','" + editTime + "')");
         rs.close();
         stmt.close();
     }
 
     private void addTask(String userId, String replyToken, String title, String dueDate, String content) throws SQLException {
-        //Store information about the editor
-        saveEditorInfos(userId,replyToken);
+        //Initialise helper variables
+        if (userId == null) {
+            lastEditorId = "U0000";
+        } else {
+            lastEditorId = userId.substring(0,5);
+        }
+        lastEditorName = getUsername(userId);
+        String editTime = getCurrentTime();
+        String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime "'";
 
-        //Set helper variables
-        String tableName = "todo_list";
+        //Store information about the editor
+        saveEditorInfos(lastEditorId,lastEditorName);
 
         //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
+        stmt.executeUpdate("INSERT INTO todo_list VALUES (" + shorterner0 + ")");
         stmt.close();
     }    
 }
