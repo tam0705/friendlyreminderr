@@ -101,7 +101,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                 }
                 break;
             case "/rmadd":
-                if (keywords.length > 2) {
+                if (keywords.length >= 2) {
                     String title = keywords[1];
                     String dueDate = keywords[2];
                     String taskContent = "";
@@ -118,7 +118,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         //Initialise helper variables
         String constAnswer0 = ""; //Final form of the response
         String constAnswer1 = ""; //Opening sentence
-        String constAnswer2 = "Nothing."; //Content of the ToDo list
+        String constAnswer2 = "Nothing.\n"; //Content of the ToDo list
         String constAnswer3 = ""; //Recent editor infos
         lastEditorId = "U0000";
         lastEditorName = "Unknown";
@@ -156,7 +156,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         if (taskTitles.size() > 0) {
             constAnswer2 = "";
             for (Integer i = 0; i < taskTitles.size(); i++) {
-                constAnswer2 += "- " + taskTitles.get(i) + "(" + dueDates.get(i) + ")\n";
+                constAnswer2 += "- " + taskTitles.get(i) + " (" + dueDates.get(i) + ")\n";
             }
         }
 
@@ -222,6 +222,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         lastEditorName = getUsername(userId);
         String editTime = getCurrentTime();
         String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime + "'";
+
+        //Give response to the user
+        this.reply(replyToken,new TextMessage(lastEditorName + "'s task has been successfully added!"));
 
         //Store information about the editor
         saveEditorInfos(lastEditorId,lastEditorName,editTime);
