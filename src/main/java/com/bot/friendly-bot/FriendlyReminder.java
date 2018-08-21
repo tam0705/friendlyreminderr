@@ -17,7 +17,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
@@ -25,10 +24,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.ArrayList<E>;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.sql.*;
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 @SpringBootApplication
@@ -102,11 +103,11 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                 if (keywords.length > 2) {
                     String title = keywords[1];
                     String dueDate = keywords[2];
-                    String content = "";
+                    String taskContent = "";
                     if (keywords.length == 3) {
-                        content = keywords[3];
+                        taskContent = keywords[3];
                     }
-                    addTask(userId,replyToken,title,dueDate,content);
+                    addTask(userId,replyToken,title,dueDate,taskContent);
                 }
                 break;
         }
@@ -126,9 +127,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         ResultSet rsEditor = stmt.executeQuery("SELECT user_id,user_name,edit_time FROM last_editor");
         while (rsEditor.next()) {
-            lastEditorId = rs.getString("user_id");
-            lastEditorName = rs.getString("user_name");
-            editTime = rs.getString("edit_time");
+            lastEditorId = rsEditor.getString("user_id");
+            lastEditorName = rsEditor.getString("user_name");
+            editTime = rsEditor.getString("edit_time"); 
         }
         rsEditor.close();
 
@@ -136,8 +137,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         List<String> dueDates = new ArrayList<String>();
         ResultSet rsTask = stmt.executeQuery("SELECT title,due_date FROM todo_list");
         while (rsTask.next()) {
-            taskTitles.add(rs.getString("title"));
-            dueDates.add(rs.getString("due_date"));
+            taskTitles.add(rsTask.getString("title"));
+            dueDates.add(rsTask.getString("due_date"));
         }
         rsTask.close();
         stmt.close();
@@ -174,7 +175,6 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                             .getProfile(userId)
                             .whenComplete((profile, throwable) -> {
                                 if (throwable != null) {
-                                    this.replyText(replyToken, throwable.getMessage());
                                     return "";
                                 }
                                 return profile.getDisplayName();
@@ -208,7 +208,6 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         stmt.executeUpdate("DROP TABLE IF EXISTS " + tableName);
         stmt.executeUpdate("CREATE TABLE " + tableName + shortener0);
         stmt.executeUpdate("INSERT INTO " + tableName + shortener1 + userId + "','" + username + "','" + editTime + "')");
-        rs.close();
         stmt.close();
     }
 
@@ -224,11 +223,11 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime + "'";
 
         //Store information about the editor
-        saveEditorInfos(lastEditorId,lastEditorName);
+        saveEditorInfos(lastEditorId,lastEditorName,editTime);
 
         //Access the database
         Statement stmt = dataSource.getConnection().createStatement();
-        stmt.executeUpdate("INSERT INTO todo_list VALUES (" + shorterner0 + ")");
+        stmt.executeUpdate("INSERT INTO todo_list VALUES (" + shortener0 + ")");
         stmt.close();
     }    
 }
