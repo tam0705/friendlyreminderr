@@ -11,9 +11,14 @@ Currently, this bot is targeted to serve only <b>a specific LINE Group</b> which
 Here comes the documentation of available commands:
 ```
 User commands:
-/help <string:command> - Show help of using a command. Leave blank to show list of commands.
-/reminder <(string/int):parameter> - Show the ToDo list.
+/help <string:command> - Shows help of using a command. Leave blank to show list of user commands.
+/reminder <(string/int):parameter> - Shows the ToDo list.
 /rm <(string/int):parameter> - Behaves similar to /reminder.
-/rmadd <string:title> <string:due_date> <(optional)string:content> - Add a task to the ToDo list.
-/rmdel <string:parameter> - Delete a task in the ToDo list.
+/rmadd <string:title> <string:due_date> <(optional)string:content> - Adds a task to the ToDo list.
+/rmdel <string:title> - Deletes an existing task.
+/rmedit <string:property> <string:title> <string:new_property> - Edits an existing task.
+/rminfo <string:title> - Shows brief information of an existing task.
+
+Admin commands:
+/helpadmin - Shows the list of admin commands.
 ```
