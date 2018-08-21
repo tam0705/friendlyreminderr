@@ -180,8 +180,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                         }
                         username = profile.getDisplayName();
                     });
+            return username;
         }
-        return username;
     }
 
     private String getCurrentTime() throws SQLException {
