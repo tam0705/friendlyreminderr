@@ -170,8 +170,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     }
 
     private String getUsername(String userId) {
+        String username = "Unknown";
         if (userId != null) {
-            String username = "Unknown";
             lineMessagingClient
                     .getProfile(userId)
                     .whenComplete((profile, throwable) -> {
@@ -179,9 +179,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                                 return;
                         }
                         username = profile.getDisplayName();
-                    });
-            return username;
+                    }); 
         }
+        return username;
     }
 
     private String getCurrentTime() throws SQLException {
