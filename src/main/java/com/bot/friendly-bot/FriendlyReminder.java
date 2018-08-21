@@ -171,17 +171,17 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     private String getUsername(String userId) {
         if (userId != null) {
-                    lineMessagingClient
-                            .getProfile(userId)
-                            .whenComplete((profile, throwable) -> {
-                                if (throwable != null) {
-                                    return "";
-                                }
-                                return profile.getDisplayName();
-                            });
-        } else {
-            return "Unknown";
+            String username = "Unknown";
+            lineMessagingClient
+                    .getProfile(userId)
+                    .whenComplete((profile, throwable) -> {
+                        if (throwable != null) {
+                                return;
+                        }
+                        username = profile.getDisplayName();
+                    });
         }
+        return username;
     }
 
     private String getCurrentTime() throws SQLException {
