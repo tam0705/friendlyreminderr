@@ -37,6 +37,7 @@ import javax.sql.DataSource;
 public class FriendlyReminder extends SpringBootServletInitializer {
     private String lastEditorId;
     private String lastEditorName;
+    private String username;
 
     @Autowired
     private LineMessagingClient lineMessagingClient;
@@ -170,13 +171,13 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     }
 
     private String getUsername(String userId) {
-        String username = "Unknown";
+        username = "Unknown";
         if (userId != null) {
             lineMessagingClient
                     .getProfile(userId)
                     .whenComplete((profile, throwable) -> {
                         if (throwable != null) {
-                                return;
+                            return;
                         }
                         username = profile.getDisplayName();
                     }); 
