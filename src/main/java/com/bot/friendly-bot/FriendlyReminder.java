@@ -136,10 +136,11 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         ResultSet rsEditor = stmt.executeQuery("SELECT user_id,user_name,edit_time FROM last_editor");
         while (rsEditor.next()) {
-            lastEditorId = rsEditor.getString("user_id").substring(0,5);
+            lastEditorId = rsEditor.getString("user_id");
             lastEditorName = rsEditor.getString("user_name");
             editTime = rsEditor.getString("edit_time"); 
         }
+        lastEditorId = lastEditorId.substring(0,5);
         rsEditor.close();
 
         List<String> taskTitles = new ArrayList<String>();
