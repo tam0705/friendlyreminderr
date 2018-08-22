@@ -237,12 +237,15 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         String[] dateProperties = dueDate.split("/");
         if (dateProperties.length == 3) {
             for (Integer i = 0; i < 3; i++) {
-                if ((i < 2 && !dateProperties[i].matches("[0-9]{3,}")) || //This line checks date and month
-                    (i == 2 && !dateProperties[i].matches("[0-9]{5,}"))) { //This line checks year
+                if ((i < 2 && !dateProperties[i].matches("[0-9]+") && dateProperties[i].length == 2) || //This line checks date and month
+                    (i == 2 && !dateProperties[i].matches("[0-9]+") && dateProperties[i].length == 4)) { //This line checks year
                     this.reply(replyToken,new TextMessage("Invalid due date format."));
                     return;
                 }
             }    
+        } else {
+            this.reply(replyToken,new TextMessage("Invalid due date format."));
+            return;
         }
 
         //Initialise helper variables
@@ -273,7 +276,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         ResultSet rs = stmt.executeQuery("SELECT title FROM todo_list");
         Boolean titleFound = false;
         while (rs.next()) {
-            if (rs.getString("title") == title) {
+            if (rs.getString("title").equals(title)) {
                 titleFound = true;
                 stmt.executeUpdate("DELETE FROM todo_list WHERE title='" + title + "'");
                 this.reply(replyToken,new TextMessage(lastEditorName + " has successfully deleted a task!"));
