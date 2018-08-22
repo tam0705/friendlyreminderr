@@ -208,7 +208,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     private void saveEditorInfos(String userId, String username, String editTime) throws SQLException {
         //Initialise helper variables
         String tableName = "last_editor";
-        String shortener0 = " (user_id varchar(5) not null,user_name varchar(20) not null,edit_time varchar(255) not null);";
+        String shortener0 = " (user_id varchar(255) not null,user_name varchar(24) not null,edit_time varchar(255) not null);";
         String shortener1 = "(user_id,user_name,edit_time) VALUES ('";
 
         //Access the database and save the infos
@@ -237,8 +237,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         String[] dateProperties = dueDate.split("/");
         if (dateProperties.length == 3) {
             for (Integer i = 0; i < 3; i++) {
-                if ((i < 2 && (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length != 2)) || //This line checks date and month
-                    (i == 2 && (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length != 4))) { //This line checks year
+                if ((i < 2 && (!dateProperties[i].matches("\d") || dateProperties[i].length != 2)) || //This line checks date and month
+                    (i == 2 && (!dateProperties[i].matches("\d") || dateProperties[i].length != 4))) { //This line checks year
                     this.reply(replyToken,new TextMessage("Invalid due date format."));
                     return;
                 }
