@@ -223,7 +223,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         //Check whether parameters are valid
         //Check whether another task already has the title
         Statement checker = dataSource.getConnection().createStatement();
-        ResultSet rsCheck = stmt.executeQuery("SELECT title FROM todo_list");
+        ResultSet rsCheck = checker.executeQuery("SELECT title FROM todo_list");
         while (rsCheck.next()) {
             if (rsCheck.getString("title") == title) {
                 this.reply(replyToken,new TextMessage("That title has been owned by another task."));
@@ -290,6 +290,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
 
         //Store information about the editor
+        String editTime = getCurrentTime();
         saveEditorInfos(lastEditorId,lastEditorName,editTime);
     }    
 }
