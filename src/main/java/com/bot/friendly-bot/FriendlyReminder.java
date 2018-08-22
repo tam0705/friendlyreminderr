@@ -20,7 +20,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
-import java.lang.System.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -221,7 +220,10 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         stmt.close();
     }
 
-    private void addTask(String userId, String replyToken, String title, String dueDate, String content) throws SQLException,PatternSyntaxException {
+    private void addTask(String userId, String replyToken, String title, String dueDate, String content) throws SQLException,PatternSyntaxException,NumberFormatException {
+        //Quickly get editor's information
+        refreshEditorInfos(userId);
+
         //Check whether parameters are valid
         //Check whether another task already has the title
         Statement checker = dataSource.getConnection().createStatement();
@@ -238,26 +240,34 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Checks whether due date is valid
         String[] dateProperties = dueDate.split("/");
+        Boolean isDateValid = true;
         if (dateProperties.length == 3) {
-            try {
-              for (Integer i = 0; i < 3; i++) {
-                   if ((i < 2 && (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length() != 2)) || //This line checks date and month
-                       (i == 2 && (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length() != 4))) { //This line checks year
-                       this.reply(replyToken,new TextMessage("Invalid due date format."));
-                      return;
-                   }
+            for (Integer i = 0; i < 3; i++) {
+                if (i == 0) { //Checks date
+                    if (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length() != 2) {
+                        isDateValid = false;
+                    } else if (Integer.parseInt(dateProperties[i]) > 31) {
+                        isDateValid = false;
+                    }
+                } else if (i == 1) { //Checks month
+                    if (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length() != 2) {
+                        isDateValid = false;
+                    } else if (Integer.parseInt(dateProperties[i]) > 12) {
+                        isDateValid = false;
+                    }
+                } else { //Checks year
+                    if (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length() != 4) {
+                        isDateValid = false;
+                    }
                 }
-            } catch (PatternSyntaxException error) {
-                System.out.println("ERROR PATTERN SYNTAX");
-            }
-
         } else {
+            isDateValid = false;
+        }
+        if (!isDateValid) {
             this.reply(replyToken,new TextMessage("Invalid due date format."));
-            return;
         }
 
         //Initialise helper variables
-        refreshEditorInfos(userId);
         String editTime = getCurrentTime();
         String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime + "'";
 
