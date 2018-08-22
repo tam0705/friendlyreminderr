@@ -39,7 +39,6 @@ import javax.sql.DataSource;
 public class FriendlyReminder extends SpringBootServletInitializer {
     private String lastEditorId;
     private String lastEditorName;
-    private String username;
 
     @Autowired
     private LineMessagingClient lineMessagingClient;
@@ -179,23 +178,6 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         this.reply(replyToken,new TextMessage(constAnswer0));
     }
 
-    private String getUsername(String userId) {
-        username = "Unknown";
-        if (userId != null) {
-            lineMessagingClient
-                    .getProfile(userId)
-                    .whenComplete((profile, throwable) -> {
-                        if (throwable != null) {
-                            return;
-                        }
-                        username = profile.getDisplayName();
-                        System.out.println(username);
-                    }); 
-        }
-        System.out.println(username);
-        return username;
-    }
-
     private String getCurrentTime() throws SQLException {
         String editTime = "unknown";
         Statement stmt = dataSource.getConnection().createStatement();
@@ -207,6 +189,22 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         rs.close();
         stmt.close();
         return editTime;
+    }
+
+    private String refreshEditorInfos(String userId) {
+        lastEditorId = "U0000";
+        lastEditorName = "Unknown";
+        if (userId != null) {
+            lineMessagingClient
+                    .getProfile(userId)
+                    .whenComplete((profile, throwable) -> {
+                        if (throwable != null) {
+                            return;
+                        }
+                        lastEditorId = userId;
+                        lastEditorName = profile.getDisplayName();
+                    }); 
+        }
     }
 
     private void saveEditorInfos(String userId, String username, String editTime) throws SQLException {
@@ -259,12 +257,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
 
         //Initialise helper variables
-        if (userId == null) {
-            lastEditorId = "U0000";
-        } else {
-            lastEditorId = userId;
-        }
-        lastEditorName = getUsername(userId);
+        refreshEditorInfos();
         String editTime = getCurrentTime();
         String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime + "'";
 
@@ -282,12 +275,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     private void deleteTask (String userId, String replyToken, String title) throws SQLException {
         //Initialise helper variables
-        if (userId == null) {
-            lastEditorId = "U0000";
-        } else {
-            lastEditorId = userId;
-        }
-        lastEditorName = getUsername(userId);
+        refreshEditorInfos();
         String editTime = getCurrentTime();
 
         //Search for the requested task
