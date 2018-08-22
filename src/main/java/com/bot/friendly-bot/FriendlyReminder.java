@@ -20,6 +20,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.lang.System.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -276,7 +277,9 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         ResultSet rs = stmt.executeQuery("SELECT title FROM todo_list");
         Boolean titleFound = false;
         while (rs.next()) {
-            if (rs.getString("title").equals(title)) {
+            String compareTitle = rs.getString("title");
+            System.out.println(compareTitle);
+            if (compareTitle.equals(title)) {
                 titleFound = true;
                 stmt.executeUpdate("DELETE FROM todo_list WHERE title='" + title + "'");
                 this.reply(replyToken,new TextMessage(lastEditorName + " has successfully deleted a task!"));
