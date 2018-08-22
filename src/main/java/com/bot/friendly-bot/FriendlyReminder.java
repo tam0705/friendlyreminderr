@@ -297,6 +297,12 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
 
         //Store information about the editor
+        if (userId == null) {
+            lastEditorId = "U0000";
+        } else {
+            lastEditorId = userId;
+        }
+        lastEditorName = getUsername(userId);
         String editTime = getCurrentTime();
         saveEditorInfos(lastEditorId,lastEditorName,editTime);
     }    
