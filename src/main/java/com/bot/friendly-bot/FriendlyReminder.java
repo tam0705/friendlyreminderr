@@ -260,6 +260,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                         isDateValid = false;
                     }
                 }
+            }
         } else {
             isDateValid = false;
         }
