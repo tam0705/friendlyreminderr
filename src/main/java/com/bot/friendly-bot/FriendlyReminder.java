@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.PatternSyntaxException;
 import java.sql.*;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -101,14 +102,20 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                 }
                 break;
             case "/rmadd":
-                if (keywords.length >= 2) {
+                if (keywords.length >= 3) {
                     String title = keywords[1];
                     String dueDate = keywords[2];
                     String taskContent = "";
-                    if (keywords.length == 3) {
+                    if (keywords.length == 4) {
                         taskContent = keywords[3];
                     }
                     addTask(userId,replyToken,title,dueDate,taskContent);
+                }
+                break;
+            case "/rmdel":
+                if (keywords.length == 2) {
+                    String title = keywords[1];
+                    deleteTask(userId,replyToken,title);
                 }
                 break;
         }
@@ -128,7 +135,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         ResultSet rsEditor = stmt.executeQuery("SELECT user_id,user_name,edit_time FROM last_editor");
         while (rsEditor.next()) {
-            lastEditorId = rsEditor.getString("user_id");
+            lastEditorId = rsEditor.getString("user_id").substring(0,5);
             lastEditorName = rsEditor.getString("user_name");
             editTime = rsEditor.getString("edit_time"); 
         }
@@ -212,19 +219,44 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         stmt.close();
     }
 
-    private void addTask(String userId, String replyToken, String title, String dueDate, String content) throws SQLException {
+    private void addTask(String userId, String replyToken, String title, String dueDate, String content) throws SQLException,PatternSyntaxException {
+        //Check whether parameters are valid
+        //Check whether another task already has the title
+        Statement checker = dataSource.getConnection().createStatement();
+        ResultSet rsCheck = stmt.executeQuery("SELECT title FROM todo_list");
+        while (rsCheck.next()) {
+            if (rsCheck.getString("title") == title) {
+                this.reply(replyToken,new TextMessage("That title has been owned by another task."));
+                return;
+            }
+        }
+        rsCheck.close()
+        checker.close()
+
+        //Checks whether due date is valid
+        String[] dateProperties = dueDate.split("/");
+        if (dateProperties.length == 3) {
+            for (Integer i = 0; i < 3; i++) {
+                if ((i < 2 && !dateProperties[i].matches("[0-9]{3,}")) || //This line checks date and month
+                    (i == 2 && !dateProperties[i].matches("[0-9]{5,}"))) { //This line checks year
+                    this.reply(replyToken,new TextMessage("Invalid due date format."));
+                    return;
+                }
+            }    
+        }
+
         //Initialise helper variables
         if (userId == null) {
             lastEditorId = "U0000";
         } else {
-            lastEditorId = userId.substring(0,5);
+            lastEditorId = userId;
         }
         lastEditorName = getUsername(userId);
         String editTime = getCurrentTime();
         String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime + "'";
 
         //Give response to the user
-        this.reply(replyToken,new TextMessage(lastEditorName + "'s task has been successfully added!"));
+        this.reply(replyToken,new TextMessage(lastEditorName + " has successfully added a task!"));
 
         //Store information about the editor
         saveEditorInfos(lastEditorId,lastEditorName,editTime);
@@ -233,5 +265,31 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         stmt.executeUpdate("INSERT INTO todo_list VALUES (" + shortener0 + ")");
         stmt.close();
+    }
+
+    private void deleteTask (String userId, String replyToken, String title) throws SQLException {
+        //Search for the requested task
+        Statement stmt = dataSource.getConnection().createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT title FROM todo_list");
+        Boolean titleFound = false;
+        while (rs.next()) {
+            if (rs.getString("title") == title) {
+                titleFound = true;
+                stmt.executeUpdate("DELETE FROM todo_list WHERE title='" + title + "'");
+                this.reply(replyToken,new TextMessage(lastEditorName + " has successfully deleted a task!"))
+                break;
+            }
+        }
+        rs.close();
+        stmt.close();
+
+        //Give response if title is invalid
+        if (!titleFound) {
+            this.reply(replyToken,new TextMessage("That title cannot be found."))
+            return;
+        }
+
+        //Store information about the editor
+        saveEditorInfos(lastEditorId,lastEditorName,editTime);
     }    
 }
