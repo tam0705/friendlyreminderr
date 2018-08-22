@@ -16,7 +16,7 @@ User commands:
 /rm <(string/int):parameter> - Behaves similar to /reminder.
 /rmadd <string:title> <string:due_date> <(optional)string:content> - Adds a task to the ToDo list.
 /rmdel <string:title> - Deletes an existing task.
-/rmedit <string:property> <string:title> <string:new_property> - Edits an existing task.
+/rmedit <string:title> <string:property_name> <string:new_property> - Edits an existing task.
 /rminfo <string:title> - Shows brief information of an existing task.
 
 Admin commands:
