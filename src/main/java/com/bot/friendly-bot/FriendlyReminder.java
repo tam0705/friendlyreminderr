@@ -191,7 +191,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         return editTime;
     }
 
-    private String refreshEditorInfos(String userId) {
+    private void refreshEditorInfos(String userId) {
         lastEditorId = "U0000";
         lastEditorName = "Unknown";
         if (userId != null) {
