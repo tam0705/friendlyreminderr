@@ -230,8 +230,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                 return;
             }
         }
-        rsCheck.close()
-        checker.close()
+        rsCheck.close();
+        checker.close();
 
         //Checks whether due date is valid
         String[] dateProperties = dueDate.split("/");
@@ -276,7 +276,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
             if (rs.getString("title") == title) {
                 titleFound = true;
                 stmt.executeUpdate("DELETE FROM todo_list WHERE title='" + title + "'");
-                this.reply(replyToken,new TextMessage(lastEditorName + " has successfully deleted a task!"))
+                this.reply(replyToken,new TextMessage(lastEditorName + " has successfully deleted a task!"));
                 break;
             }
         }
@@ -285,7 +285,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Give response if title is invalid
         if (!titleFound) {
-            this.reply(replyToken,new TextMessage("That title cannot be found."))
+            this.reply(replyToken,new TextMessage("That title cannot be found."));
             return;
         }
 
