@@ -257,7 +257,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
 
         //Initialise helper variables
-        refreshEditorInfos();
+        refreshEditorInfos(userId);
         String editTime = getCurrentTime();
         String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime + "'";
 
@@ -275,7 +275,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
     private void deleteTask (String userId, String replyToken, String title) throws SQLException {
         //Initialise helper variables
-        refreshEditorInfos();
+        refreshEditorInfos(userId);
         String editTime = getCurrentTime();
 
         //Search for the requested task
