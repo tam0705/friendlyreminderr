@@ -189,8 +189,10 @@ public class FriendlyReminder extends SpringBootServletInitializer {
                             return;
                         }
                         username = profile.getDisplayName();
+                        System.out.println(username);
                     }); 
         }
+        System.out.println(username);
         return username;
     }
 
@@ -227,7 +229,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement checker = dataSource.getConnection().createStatement();
         ResultSet rsCheck = checker.executeQuery("SELECT title FROM todo_list");
         while (rsCheck.next()) {
-            if (rsCheck.getString("title") == title) {
+            String compareTitle = rsCheck.getString("title");
+            if (compareTitle.equals(title)) {
                 this.reply(replyToken,new TextMessage("That title has been owned by another task."));
                 return;
             }
@@ -238,13 +241,13 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         //Checks whether due date is valid
         String[] dateProperties = dueDate.split("/");
         if (dateProperties.length == 3) {
-            for (Integer i = 0; i < 3; i++) {
+            /*for (Integer i = 0; i < 3; i++) {
                 if ((i < 2 && (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length() != 2)) || //This line checks date and month
                     (i == 2 && (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length() != 4))) { //This line checks year
                     this.reply(replyToken,new TextMessage("Invalid due date format."));
                     return;
                 }
-            }    
+            }*/    
         } else {
             this.reply(replyToken,new TextMessage("Invalid due date format."));
             return;
@@ -273,13 +276,21 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     }
 
     private void deleteTask (String userId, String replyToken, String title) throws SQLException {
+        //Initialise helper variables
+        if (userId == null) {
+            lastEditorId = "U0000";
+        } else {
+            lastEditorId = userId;
+        }
+        lastEditorName = getUsername(userId);
+        String editTime = getCurrentTime();
+
         //Search for the requested task
         Statement stmt = dataSource.getConnection().createStatement();
         ResultSet rs = stmt.executeQuery("SELECT title FROM todo_list");
         Boolean titleFound = false;
         while (rs.next()) {
             String compareTitle = rs.getString("title");
-            System.out.println(compareTitle);
             if (compareTitle.equals(title)) {
                 titleFound = true;
                 stmt.executeUpdate("DELETE FROM todo_list WHERE title='" + title + "'");
@@ -297,13 +308,6 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         }
 
         //Store information about the editor
-        if (userId == null) {
-            lastEditorId = "U0000";
-        } else {
-            lastEditorId = userId;
-        }
-        lastEditorName = getUsername(userId);
-        String editTime = getCurrentTime();
         saveEditorInfos(lastEditorId,lastEditorName,editTime);
     }    
 }
