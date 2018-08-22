@@ -237,8 +237,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         String[] dateProperties = dueDate.split("/");
         if (dateProperties.length == 3) {
             for (Integer i = 0; i < 3; i++) {
-                if ((i < 2 && !dateProperties[i].matches("[0-9]+") && dateProperties[i].length == 2) || //This line checks date and month
-                    (i == 2 && !dateProperties[i].matches("[0-9]+") && dateProperties[i].length == 4)) { //This line checks year
+                if ((i < 2 && (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length != 2)) || //This line checks date and month
+                    (i == 2 && (!dateProperties[i].matches("[0-9]+") || dateProperties[i].length != 4))) { //This line checks year
                     this.reply(replyToken,new TextMessage("Invalid due date format."));
                     return;
                 }
