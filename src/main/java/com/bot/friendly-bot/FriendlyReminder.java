@@ -221,6 +221,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
     }
 
     private void addTask(String userId, String replyToken, String title, String dueDate, String content) throws SQLException,PatternSyntaxException,NumberFormatException {
+        try {
         //Quickly get editor's information
         refreshEditorInfos(userId);
 
@@ -273,7 +274,7 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         String shortener0 = "'" + title + "','" + dueDate + "','" + content + "','" + lastEditorId + "','" + lastEditorName +"','" + editTime + "'";
 
         //Give response to the user
-        this.reply(replyToken,new TextMessage(lastEditorName + " has successfully added a task!"));
+        this.reply(replyToken, new TextMessage(lastEditorName + " has successfully added a task!"));
 
         //Store information about the editor
         saveEditorInfos(lastEditorId,lastEditorName,editTime);
@@ -282,9 +283,13 @@ public class FriendlyReminder extends SpringBootServletInitializer {
         Statement stmt = dataSource.getConnection().createStatement();
         stmt.executeUpdate("INSERT INTO todo_list VALUES (" + shortener0 + ")");
         stmt.close();
+        } catch (SQLException error) {
+            this.reply(replyToken, new TextMessage("SQLException: " + error.toString()));
+        }
     }
 
     private void deleteTask (String userId, String replyToken, String title) throws SQLException {
+        try {
         //Initialise helper variables
         refreshEditorInfos(userId);
         String editTime = getCurrentTime();
@@ -313,5 +318,8 @@ public class FriendlyReminder extends SpringBootServletInitializer {
 
         //Store information about the editor
         saveEditorInfos(lastEditorId,lastEditorName,editTime);
+        } catch (SQLException error) {
+            this.reply(replyToken, new TextMessage("Error: " + error.toString()));
+        }
     }    
 }
